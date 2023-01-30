@@ -13,7 +13,7 @@ interface UserData {
   username: string;
 }
 
-const registerSchema = z.object({
+export const registerSchema = z.object({
   username: z
     .string()
     .trim()

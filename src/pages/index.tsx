@@ -8,6 +8,7 @@ import { useToast } from "@chakra-ui/react";
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
   const registerMutation = api.user.register.useMutation();
+
   const toast = useToast();
   const handleSubmit = (values: RegistrationFormValues) => {
     const username = values.username;
