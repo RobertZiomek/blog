@@ -7,28 +7,13 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { env } from "../../../env/server.mjs";
 import { TRPCError } from "@trpc/server";
 import { type User, users } from "../storage";
+import { registerSchema } from "../../../schemas/registerSchema";
+import { loginSchema } from "../../../schemas/loginSchema";
 
 interface UserData {
   id: string;
   username: string;
 }
-
-const registerSchema = z.object({
-  username: z
-    .string()
-    .trim()
-    .min(3)
-    .refine(
-      (val) => !users.some((user) => user.username === val),
-      "Username is already in use"
-    ),
-  password: z.string().trim().min(3),
-});
-
-const loginSchema = z.object({
-  username: z.string(),
-  password: z.string(),
-});
 
 export interface JwtPayload {
   userId: string;
@@ -40,6 +25,17 @@ export const userRouter = createTRPCRouter({
   register: publicProcedure
     .input(registerSchema)
     .mutation(async ({ input }) => {
+      const isUsernameAlreadyInUse = users.some(
+        (user) => user.username === input.username
+      );
+
+      if (isUsernameAlreadyInUse) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Username is already in use",
+        });
+      }
+
       const user: User = {
         id: v4(),
         password: await argon2.hash(input.password),
