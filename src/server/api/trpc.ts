@@ -17,12 +17,10 @@
  *
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { type Session } from "next-auth";
-
-import { getServerAuthSession } from "../auth";
+import jwt from "jsonwebtoken";
 
 type CreateContextOptions = {
-  session: Session | null;
+  userId: string | null;
 };
 
 /**
@@ -36,8 +34,25 @@ type CreateContextOptions = {
  */
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
-    session: opts.session,
+    userId: opts.userId,
   };
+};
+
+const getUserId = (req: NextApiRequest): string | null => {
+  if (
+    !req.headers.authorization ||
+    !req.headers.authorization.startsWith("Bearer")
+  ) {
+    return null;
+  }
+
+  const accessToken = req.headers.authorization.split(" ")[1];
+  if (!accessToken) {
+    return null;
+  }
+
+  const decoded = jwt.verify(accessToken, env.JWT_SECRET) as JwtPayload;
+  return decoded?.userId || null;
 };
 
 /**
@@ -45,14 +60,11 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  * process every request that goes through your tRPC endpoint
  * @link https://trpc.io/docs/context
  */
-export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-  const { req, res } = opts;
-
-  // Get the session from the server using the unstable_getServerSession wrapper function
-  const session = await getServerAuthSession({ req, res });
+export const createTRPCContext = (opts: CreateNextContextOptions) => {
+  const { req } = opts;
 
   return createInnerTRPCContext({
-    session,
+    userId: getUserId(req),
   });
 };
 
@@ -64,6 +76,9 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  */
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
+import type { NextApiRequest } from "next";
+import { env } from "../../env/server.mjs";
+import type { JwtPayload } from "./routers/user";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -99,15 +114,11 @@ export const publicProcedure = t.procedure;
  * procedure
  */
 const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
+  if (!ctx.userId) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
-  return next({
-    ctx: {
-      // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session.user },
-    },
-  });
+
+  return next({ ctx });
 });
 
 /**
