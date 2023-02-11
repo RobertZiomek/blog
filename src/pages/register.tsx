@@ -8,8 +8,13 @@ import { useAuth } from "../hooks/useAuth";
 import { useRouter } from "next/router";
 
 const RegisterPage: NextPage = () => {
+<<<<<<< HEAD
   const router = useRouter();
   const { login } = useAuth();
+=======
+  const authData = useAuth();
+
+>>>>>>> refs/remotes/blog/registration
   const toast = useToast();
   const registerMutation = api.user.register.useMutation();
 
@@ -21,6 +26,7 @@ const RegisterPage: NextPage = () => {
           status: "error",
         });
       },
+
       onSuccess: (data) => {
         login(data.accessToken, data.user.username);
         router.push({ pathname: "/header" });
