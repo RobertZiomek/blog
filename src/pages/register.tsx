@@ -5,11 +5,11 @@ import type { RegisterValues } from "../schemas/registerSchema";
 import { useToast } from "../hooks/useToast";
 import { Layout } from "../components/Layout";
 import { useAuth } from "../hooks/useAuth";
-import Router, { withRouter } from "next/router";
+import { useRouter } from "next/router";
 
 const RegisterPage: NextPage = () => {
-  const authData = useAuth();
-
+  const router = useRouter();
+  const { login } = useAuth();
   const toast = useToast();
   const registerMutation = api.user.register.useMutation();
 
@@ -23,8 +23,8 @@ const RegisterPage: NextPage = () => {
       },
 
       onSuccess: (data) => {
-        authData.login(data.accessToken, data.user.username);
-        Router.push({ pathname: "/header" });
+        login(data.accessToken, data.user.username);
+        router.push({ pathname: "/header" });
         toast({
           title: "Your account has been successfully created",
           status: "success",

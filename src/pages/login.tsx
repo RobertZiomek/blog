@@ -4,13 +4,13 @@ import { Layout } from "../components/Layout";
 import { LoginForm } from "../components/LoginForm";
 import { useAuth } from "../hooks/useAuth";
 import { useToast } from "../hooks/useToast";
-import { AuthProvider } from "../providers/AuthProvider";
 import { LoginValues } from "../schemas/loginSchema";
 import { api } from "../utils/api";
-import Router from "next/router";
+import { useRouter } from "next/router";
 
 const LoginPage: NextPage = ({}) => {
-  const authData = useAuth();
+  const router = useRouter();
+  const { login } = useAuth();
   const toast = useToast();
   const loginMutation = api.user.login.useMutation();
 
@@ -23,8 +23,8 @@ const LoginPage: NextPage = ({}) => {
         });
       },
       onSuccess: (data) => {
-        authData.login(data.accessToken, data.user.username);
-        Router.push({ pathname: "/header" });
+        login(data.accessToken, data.user.username);
+        router.push({ pathname: "/header" });
 
         toast({
           title: "You are successfully logged in",
