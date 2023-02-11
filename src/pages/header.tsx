@@ -5,10 +5,10 @@ import { Layout } from "../components/Layout";
 
 const HeaderPage = () => {
   const router = useRouter();
-  const userAuth = useAuth();
+  const { logout } = useAuth();
   const handleLogut = () => {
     router.push("/");
-    userAuth.logout();
+    logout();
   };
   return (
     <Layout>

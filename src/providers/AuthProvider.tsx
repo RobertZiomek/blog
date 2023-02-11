@@ -18,15 +18,15 @@ export const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const [userLogin, setUserLogin] = useState<User>({
-    accessToken: "",
-    user: "",
+    accessToken: null,
+    user: null,
   });
   const login = (accessToken: string, user: string) => {
     setUserLogin({ accessToken, user });
   };
 
   const logout = () => {
-    setUserLogin({ accessToken: "", user: "" });
+    setUserLogin({ accessToken: null, user: null });
   };
   return (
     <AuthContext.Provider
