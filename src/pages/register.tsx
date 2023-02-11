@@ -9,6 +9,7 @@ import Router, { withRouter } from "next/router";
 
 const RegisterPage: NextPage = () => {
   const authData = useAuth();
+
   const toast = useToast();
   const registerMutation = api.user.register.useMutation();
 
@@ -20,6 +21,7 @@ const RegisterPage: NextPage = () => {
           status: "error",
         });
       },
+
       onSuccess: (data) => {
         authData.login(data.accessToken, data.user.username);
         Router.push({ pathname: "/header" });
