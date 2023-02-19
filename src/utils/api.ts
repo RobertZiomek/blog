@@ -9,6 +9,7 @@ import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 import superjson from "superjson";
+import { ACCESS_TOKEN } from "../constants/localStorage";
 
 import { type AppRouter } from "../server/api/root";
 
@@ -42,6 +43,16 @@ export const api = createTRPCNext<AppRouter>({
         }),
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc`,
+          headers() {
+            const accessToken = localStorage.getItem(ACCESS_TOKEN);
+            if (!accessToken) {
+              return {};
+            }
+
+            return {
+              Authorization: `Bearer ${accessToken}`,
+            };
+          },
         }),
       ],
     };
