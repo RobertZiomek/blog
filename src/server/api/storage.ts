@@ -1,8 +1,10 @@
 import fs from "fs";
 import { z } from "zod";
+import { BlogPostCategory } from "../../types/blogPost";
 
 enum Collection {
   USERS = "users",
+  BLOG_POSTS = "blog-posts",
 }
 
 const saveCollection = <T>(name: Collection, data: T[]) => {
@@ -32,10 +34,25 @@ export const userSchema = z.object({
   password: z.string(),
 });
 
+export const blogPostSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  categories: z.array(z.nativeEnum(BlogPostCategory)),
+  score: z.number(),
+  author: z.object({
+    id: z.string(),
+  }),
+});
+
 export type User = z.infer<typeof userSchema>;
+
+export type BlogPost = z.infer<typeof blogPostSchema>;
 
 export const users = loadCollection(Collection.USERS, userSchema);
 
+export const blogPosts = loadCollection(Collection.BLOG_POSTS, blogPostSchema);
+
 export const persist = () => {
   saveCollection(Collection.USERS, users);
+  saveCollection(Collection.BLOG_POSTS, blogPosts);
 };
