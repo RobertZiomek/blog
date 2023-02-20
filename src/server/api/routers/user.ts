@@ -6,7 +6,7 @@ import argon2 from "argon2";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { env } from "../../../env/server.mjs";
 import { TRPCError } from "@trpc/server";
-import { type User, users } from "../storage";
+import { type User, users, persist } from "../storage";
 import { registerSchema } from "../../../schemas/registerSchema";
 import { loginSchema } from "../../../schemas/loginSchema";
 
@@ -43,6 +43,7 @@ export const userRouter = createTRPCRouter({
       };
 
       users.push(user);
+      persist();
 
       const userData: UserData = {
         id: user.id,
