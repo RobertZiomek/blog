@@ -6,6 +6,9 @@ import { useToast } from "../hooks/useToast";
 import { Layout } from "../components/Layout";
 import { useAuth } from "../hooks/useAuth";
 import { useRouter } from "next/router";
+import dynamic from "next/dynamic";
+import { AccessControl } from "../components/AccesControl";
+import { Button } from "@chakra-ui/react";
 
 const RegisterPage: NextPage = () => {
   const router = useRouter();
@@ -24,7 +27,7 @@ const RegisterPage: NextPage = () => {
 
       onSuccess: (data) => {
         login(data.accessToken, data.user.username);
-        router.push({ pathname: "/header" });
+        router.replace("/");
         toast({
           title: "Your account has been successfully created",
           status: "success",
@@ -33,13 +36,18 @@ const RegisterPage: NextPage = () => {
     });
   };
   return (
-    <Layout>
-      <RegisterForm
-        isLoading={registerMutation.isLoading}
-        onSubmit={handleSubmit}
-      />
-    </Layout>
+    <AccessControl isAuthorized={false}>
+      <Layout>
+        <RegisterForm
+          isLoading={registerMutation.isLoading}
+          onSubmit={handleSubmit}
+        />
+        <Button onClick={() => router.replace("/")}>Back</Button>
+      </Layout>
+    </AccessControl>
   );
 };
 
-export default RegisterPage;
+export default dynamic(() => Promise.resolve(RegisterPage), {
+  ssr: false,
+});

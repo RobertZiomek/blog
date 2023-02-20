@@ -7,6 +7,9 @@ import { useToast } from "../hooks/useToast";
 import { LoginValues } from "../schemas/loginSchema";
 import { api } from "../utils/api";
 import { useRouter } from "next/router";
+import dynamic from "next/dynamic";
+import { AccessControl } from "../components/AccesControl";
+import { Button } from "@chakra-ui/react";
 
 const LoginPage: NextPage = ({}) => {
   const router = useRouter();
@@ -24,7 +27,7 @@ const LoginPage: NextPage = ({}) => {
       },
       onSuccess: (data) => {
         login(data.accessToken, data.user.username);
-        router.push({ pathname: "/header" });
+        router.replace("/");
 
         toast({
           title: "You are successfully logged in",
@@ -34,10 +37,18 @@ const LoginPage: NextPage = ({}) => {
     });
   };
   return (
-    <Layout>
-      <LoginForm isLoading={loginMutation.isLoading} onSubmit={handleSubmit} />
-    </Layout>
+    <AccessControl isAuthorized={false}>
+      <Layout>
+        <LoginForm
+          isLoading={loginMutation.isLoading}
+          onSubmit={handleSubmit}
+        />
+        <Button onClick={() => router.replace("/")}>Back</Button>
+      </Layout>
+    </AccessControl>
   );
 };
 
-export default LoginPage;
+export default dynamic(() => Promise.resolve(LoginPage), {
+  ssr: false,
+});
