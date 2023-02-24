@@ -1,0 +1,41 @@
+import {
+  Box,
+  Card,
+  CardBody,
+  CardHeader,
+  Heading,
+  Stack,
+  StackDivider,
+  Text,
+} from "@chakra-ui/react";
+import React from "react";
+import { BlogPostCategory } from "../types/blogPost";
+
+export interface PostFormType {
+  title: string;
+  score: number;
+  categories: BlogPostCategory[];
+  author: string;
+}
+
+export function PostForm({ author, categories, score, title }: PostFormType) {
+  return (
+    <Card bg={"#EDF2F7"} mb={5} mt={5}>
+      <CardHeader>
+        <Box display={"flex"} justifyContent={"space-between"}>
+          {" "}
+          <Heading size="md">Author</Heading>
+          <Text size="md">{score}</Text>
+        </Box>
+      </CardHeader>
+
+      <CardBody>
+        <Stack divider={<StackDivider />} spacing="4">
+          <Box>
+            <Text size="xs">{title}</Text>
+          </Box>
+        </Stack>
+      </CardBody>
+    </Card>
+  );
+}

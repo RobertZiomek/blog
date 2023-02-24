@@ -3,6 +3,7 @@ import { type NextPage } from "next";
 import { Layout } from "../components/Layout";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
+import { Posts } from "../components/Post";
 
 const HomePage: NextPage = () => {
   const router = useRouter();
@@ -15,6 +16,7 @@ const HomePage: NextPage = () => {
           User Profile
         </Button>
       </HStack>
+      <Posts />
     </Layout>
   );
 };

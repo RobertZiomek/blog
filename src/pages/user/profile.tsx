@@ -8,7 +8,7 @@ function Profile() {
   api.user.me.useQuery();
   return (
     <AccessControl isAuthorized={true}>
-      <div>zalogowany</div>
+      <div>Logged</div>
       <Header />
     </AccessControl>
   );
