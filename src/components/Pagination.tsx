@@ -1,25 +1,31 @@
-import { Button, Center, Text } from "@chakra-ui/react";
+import { Button, Center } from "@chakra-ui/react";
 import React from "react";
 
-const EMPTY_BUTTON = "...";
 interface PaginationProps {
-  paginationPosts: number[] | null;
+  paginationPages: number;
+  activePage: number;
   handlePaginationPageChange: (paginationPages: number) => void;
 }
+
 export const Pagination = ({
   handlePaginationPageChange,
-  paginationPosts,
+  paginationPages,
+  activePage,
 }: PaginationProps) => {
-  const buttonList = paginationPosts?.map((page) => {
-    if (page !== 0) {
-      return (
-        <Button onClick={() => handlePaginationPageChange(page - 1)}>
-          {page}
+  const buttonList: JSX.Element[] = [];
+  for (let i = 0; i < paginationPages; i++) {
+    if (paginationPages !== 0) {
+      buttonList.push(
+        <Button
+          colorScheme={i === activePage ? "blue" : "gray"}
+          key={i}
+          onClick={() => handlePaginationPageChange(i)}
+        >
+          {i + 1}
         </Button>
       );
-    } else {
-      return <Text>{EMPTY_BUTTON}</Text>;
     }
-  });
+  }
+
   return <Center>{buttonList}</Center>;
 };

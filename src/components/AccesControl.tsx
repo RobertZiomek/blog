@@ -1,10 +1,5 @@
 import { useRouter } from "next/router";
-import React, {
-  type FC,
-  type PropsWithChildren,
-  useEffect,
-  useLayoutEffect,
-} from "react";
+import React, { type FC, type PropsWithChildren, useLayoutEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 
 interface AccessControlProps extends PropsWithChildren {

@@ -3,71 +3,81 @@ import { type NextPage } from "next";
 import { Layout } from "../components/Layout";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
-import { Posts } from "../components/Post";
+import { PostList } from "../components/PostList";
 import { api } from "../utils/api";
-import { useEffect, useState } from "react";
-import { BlogPostCategory } from "../types/blogPost";
-import SearchPost from "../components/SearchPost";
-import { usePagination } from "../hooks/usePagination";
+import { useState } from "react";
 import { useDebounce } from "../hooks/useDebounce";
 import { Pagination } from "../components/Pagination";
+import { PostListFiltersValues, SearchPost } from "../components/SearchPost";
+import { z } from "zod";
+import { BlogPostCategory } from "../types/blogPost";
+import qs from "qs";
+
+const POST_LIST_FILTERS_DEBOUNCE = 500;
+const POSTS_PER_PAGE = 8;
+
+const queryParamsSchema = z.object({
+  search: z.string().optional().default(""),
+  categories: z.array(z.nativeEnum(BlogPostCategory)).optional().default([]),
+});
+
+interface QueryParams {
+  search?: string;
+  categories?: string;
+}
 
 const HomePage: NextPage = () => {
-  const [paginationPage, setPaginationPage] = useState(0);
-  const [searchActive, SetSearchActive] = useState(false);
-  const [searchCategory, setSearchCategory] = useState<BlogPostCategory[]>([]);
-  const [searchWord, setSearchWord] = useState<string>("");
-  const debounce = useDebounce(searchWord, 500);
+  const [activePage, setActivePage] = useState(0);
+  const queryParams = qs.parse(window.location.search, {
+    ignoreQueryPrefix: true,
+  }) as QueryParams;
+  const [postListFilters, setPostListFilters] = useState<PostListFiltersValues>(
+    () =>
+      queryParamsSchema.parse({
+        categories: queryParams.categories?.split(","),
+        search: queryParams.search,
+      })
+  );
   const router = useRouter();
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+  const debounce = useDebounce(
+    postListFilters.search,
+    POST_LIST_FILTERS_DEBOUNCE
+  );
 
-    const searchParam = params.get("search");
-    if (searchParam) {
-      setSearchWord(searchParam);
-    }
-
-    const categoryParam = params.get("category");
-    if (categoryParam !== null) {
-      const validCategories = Object.values(BlogPostCategory);
-      if (validCategories.includes(categoryParam as BlogPostCategory)) {
-        const categoryArray: BlogPostCategory[] = [
-          categoryParam as BlogPostCategory,
-        ];
-        setSearchCategory(categoryArray);
-      }
-    }
-  }, []);
-
-  const POSTS_PER_PAGE = 8;
-
-  const { data, isLoading, error } = api.blogPost.getBlogPosts.useQuery({
-    page: paginationPage,
+  const blogPostQuery = api.blogPost.getBlogPosts.useQuery({
+    page: activePage,
     perPage: POSTS_PER_PAGE,
-    categories: searchCategory,
+    categories: postListFilters.categories,
     search: debounce,
   });
+
+  const handlePostListFiltersChange = async (
+    filters: PostListFiltersValues
+  ) => {
+    setPostListFilters(filters);
+    await router.push(
+      {
+        query: qs.stringify(filters, {
+          arrayFormat: "comma",
+        }),
+      },
+      undefined,
+      {
+        shallow: true,
+      }
+    );
+    setActivePage(0);
+  };
+
   const handlePaginationPageChange = (paginationPage: number) => {
-    setPaginationPage(paginationPage);
+    setActivePage(paginationPage);
+    window.scroll(0, 0);
   };
-  const paginationPosts = usePagination(paginationPage, data?.total);
-  const handleSearchCategory = (category: BlogPostCategory[]) => {
-    setSearchCategory(category);
-    history.pushState(
-      null,
-      "search",
-      `?search=${searchWord}&category=${searchCategory}`
-    );
-  };
-  const handleSearchWord = (word: string) => {
-    setSearchWord(word);
-    history.pushState(
-      null,
-      "search",
-      `?search=${searchWord}&category=${searchCategory}`
-    );
-  };
+
+  const totalPages = blogPostQuery.data
+    ? Math.ceil(blogPostQuery.data.total / POSTS_PER_PAGE)
+    : 0;
 
   return (
     <Layout>
@@ -77,35 +87,26 @@ const HomePage: NextPage = () => {
         <Button onClick={() => router.replace("/user/profile")}>
           User Profile
         </Button>
-        <Button
-          onClick={() => {
-            SetSearchActive(!searchActive);
-            history.pushState(null, "search", `?search`);
-          }}
-        >
-          Search
-        </Button>
       </HStack>
-      {searchActive ? (
-        <SearchPost
-          handleSearchCategory={handleSearchCategory}
-          handleSearchWord={handleSearchWord}
-          handlePaginationPageChange={handlePaginationPageChange}
-        />
-      ) : null}
-      <Posts
-        postsQuery={data?.data}
-        paginationPage={paginationPage}
-        postsTotal={data?.total}
-        isLoading={isLoading}
-        error={error}
+
+      <SearchPost
+        filters={postListFilters}
+        onFiltersChange={handlePostListFiltersChange}
       />
-      {data?.total ? (
+
+      <PostList
+        posts={blogPostQuery.data?.data || []}
+        isLoading={blogPostQuery.isLoading}
+        isError={!!blogPostQuery.isError}
+        blogPostPerPage={POSTS_PER_PAGE}
+      />
+      {totalPages > 0 && (
         <Pagination
-          paginationPosts={paginationPosts}
+          paginationPages={totalPages}
+          activePage={activePage}
           handlePaginationPageChange={handlePaginationPageChange}
         />
-      ) : null}
+      )}
     </Layout>
   );
 };

@@ -4,6 +4,7 @@ import {
   CardBody,
   CardHeader,
   Heading,
+  ListItem,
   Stack,
   StackDivider,
   Text,
@@ -20,23 +21,25 @@ export interface PostFormProps {
 
 export function PostCard({ categories, score, title }: PostFormProps) {
   return (
-    <Card bg={"gray.300"} mb={5} mt={5}>
-      <CardHeader>
-        <Box display={"flex"} justifyContent={"space-between"}>
-          {" "}
-          <Heading size="md">Author</Heading>
-          <Text size="md">{score}</Text>
-        </Box>
-      </CardHeader>
-
-      <CardBody>
-        <Stack divider={<StackDivider />} spacing="4">
-          <Box>
-            <Text size="xs">{title}</Text>
+    <ListItem>
+      <Card bg={"gray.300"} mb={5} mt={5}>
+        <CardHeader>
+          <Box display={"flex"} justifyContent={"space-between"}>
+            {" "}
+            <Heading size="md">Author</Heading>
+            <Text size="md">{score}</Text>
           </Box>
-        </Stack>
-        <Text fontSize={12}>Category: {categories.join(", ")}</Text>
-      </CardBody>
-    </Card>
+        </CardHeader>
+
+        <CardBody>
+          <Stack divider={<StackDivider />} spacing="4">
+            <Box>
+              <Text size="xs">{title}</Text>
+            </Box>
+          </Stack>
+          <Text fontSize={12}>Category: {categories.join(", ")}</Text>
+        </CardBody>
+      </Card>
+    </ListItem>
   );
 }
