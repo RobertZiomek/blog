@@ -1,6 +1,6 @@
 import fs from "fs";
 import { z } from "zod";
-import { BlogPostCategory } from "../../types/blogPost";
+import { BlogPostCategory, BlogPostStatus } from "../../types/blogPost";
 
 enum Collection {
   USERS = "users",
@@ -37,7 +37,9 @@ export const userSchema = z.object({
 export const blogPostSchema = z.object({
   id: z.string(),
   title: z.string(),
+  content: z.string(),
   categories: z.array(z.nativeEnum(BlogPostCategory)),
+  status: z.nativeEnum(BlogPostStatus),
   score: z.number(),
   author: z.object({
     id: z.string(),
