@@ -84,9 +84,18 @@ export const userRouter = createTRPCRouter({
   }),
   me: protectedProcedure.query(({ ctx }) => {
     const user = users.find((user) => user.id === ctx.userId);
+    if (!user) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not found",
+      });
+    }
 
-    return {
-      user: user!,
+    const userData: UserData = {
+      id: user.id,
+      username: user.username,
     };
+
+    return userData;
   }),
 });

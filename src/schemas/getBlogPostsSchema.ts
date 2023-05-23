@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { BlogPostCategory } from "../types/blogPost";
+import { BlogPostCategory, BlogPostStatus } from "../types/blogPost";
 
-export const getBlogPostSchema = z.object({
+export const getBlogPostsSchema = z.object({
   page: z
     .number({
       invalid_type_error: "Page must be a number",
@@ -14,8 +14,30 @@ export const getBlogPostSchema = z.object({
       required_error: "Per page is required",
     })
     .int("Per page must be an int"),
-  search: z.string().trim().optional(),
-  categories: z.array(z.nativeEnum(BlogPostCategory)).optional(),
+  search: z
+    .string({
+      invalid_type_error: "Search must be a string",
+    })
+    .trim()
+    .optional(),
+  categories: z
+    .array(
+      z.nativeEnum(BlogPostCategory, {
+        invalid_type_error: "Categories are invalid",
+      })
+    )
+    .optional(),
+  status: z
+    .nativeEnum(BlogPostStatus, {
+      invalid_type_error: "Status is invalid",
+    })
+    .optional(),
+  authorId: z
+    .string({
+      invalid_type_error: "Author id must be an UUID",
+    })
+    .uuid("Author id must be an UUID")
+    .optional(),
 });
 
-export type GetBlogPostValues = z.infer<typeof getBlogPostSchema>;
+export type GetBlogPostsValues = z.infer<typeof getBlogPostsSchema>;

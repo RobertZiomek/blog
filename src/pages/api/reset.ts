@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { blogPosts, users, persist, type User } from "../../server/api/storage";
 import { faker } from "@faker-js/faker";
 import * as R from "remeda";
-import { BlogPostCategory } from "../../types/blogPost";
+import { BlogPostCategory, BlogPostStatus } from "../../types/blogPost";
 
 const FAKE_BLOG_POST_COUNT = 80;
 
@@ -38,6 +38,8 @@ export default async function handler(
       id: v4(),
       score: faker.datatype.number({ min: -20, max: 20 }),
       title: faker.lorem.text(),
+      content: faker.lorem.text(),
+      status: BlogPostStatus.PUBLISHED,
     });
   });
 
