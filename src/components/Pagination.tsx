@@ -2,30 +2,27 @@ import { Button, Center } from "@chakra-ui/react";
 import React from "react";
 
 interface PaginationProps {
-  paginationPages: number;
+  totalPages: number;
   activePage: number;
-  handlePaginationPageChange: (paginationPages: number) => void;
+  handlePageChange: (Page: number) => void;
 }
 
 export const Pagination = ({
-  handlePaginationPageChange,
-  paginationPages,
+  handlePageChange,
+  totalPages,
   activePage,
 }: PaginationProps) => {
-  const buttonList: JSX.Element[] = [];
-  for (let i = 0; i < paginationPages; i++) {
-    if (paginationPages !== 0) {
-      buttonList.push(
+  return (
+    <Center>
+      {new Array(totalPages).fill(null).map((_, index) => (
         <Button
-          colorScheme={i === activePage ? "blue" : "gray"}
-          key={i}
-          onClick={() => handlePaginationPageChange(i)}
+          colorScheme={index === activePage ? "blue" : "gray"}
+          key={index}
+          onClick={() => handlePageChange(index)}
         >
-          {i + 1}
+          {index + 1}
         </Button>
-      );
-    }
-  }
-
-  return <Center>{buttonList}</Center>;
+      ))}
+    </Center>
+  );
 };

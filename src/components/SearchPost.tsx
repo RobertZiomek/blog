@@ -1,5 +1,5 @@
 import { Checkbox, HStack, Input, Stack, Text } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React from "react";
 import { BlogPostCategory } from "../types/blogPost";
 
 interface PostListFiltersProps {
@@ -16,39 +16,28 @@ export const SearchPost = ({
   onFiltersChange,
   filters,
 }: PostListFiltersProps) => {
-  const [searchWord, setSearchWord] = useState(filters.search);
-  const blogPostCategory = Object.values(BlogPostCategory);
+  const blogPostCategories = Object.values(BlogPostCategory);
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (filters.categories.includes(e.target.value as BlogPostCategory)) {
-      const updatedCategoryProps = filters.categories.filter(
-        (item) => item !== e.target.value
-      );
-      onFiltersChange({ categories: updatedCategoryProps, search: searchWord });
-    } else {
-      onFiltersChange({
-        categories: [
-          ...filters.categories,
-          e.target.value,
-        ] as BlogPostCategory[],
-        search: searchWord,
-      });
-    }
+    const toggledCategory = e.target.value as BlogPostCategory;
+    const updatedCategories = filters.categories.includes(toggledCategory)
+      ? filters.categories.filter((category) => category !== toggledCategory)
+      : [...filters.categories, toggledCategory];
+
+    onFiltersChange({ ...filters, categories: updatedCategories });
   };
 
-  const handleSearchWordOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchWord(e.target.value);
+  const handleSearchWordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onFiltersChange({
-      categories: filters.categories,
+      ...filters,
       search: e.target.value,
     });
   };
-
   return (
     <>
       <HStack spacing={[1, 5]}>
         <Text>Category: </Text>
-        {blogPostCategory.map((category) => (
+        {blogPostCategories.map((category) => (
           <Checkbox
             key={category}
             value={category}
@@ -65,7 +54,7 @@ export const SearchPost = ({
         <Input
           placeholder="Search..."
           size="md"
-          onChange={handleSearchWordOnChange}
+          onChange={handleSearchWordChange}
           value={filters.search}
         />
       </Stack>

@@ -8,7 +8,7 @@ interface PostListLoaderProps {
 export const PostListLoader = ({ blogPostPerPage }: PostListLoaderProps) => {
   return (
     <VStack>
-      {new Array(blogPostPerPage).fill("").map((name, index) => (
+      {new Array(blogPostPerPage).fill(null).map((_, index) => (
         <Skeleton key={index} width={480}>
           ...
         </Skeleton>

@@ -4,7 +4,6 @@ import {
   CardBody,
   CardHeader,
   Heading,
-  ListItem,
   Stack,
   StackDivider,
   Text,
@@ -12,34 +11,32 @@ import {
 import React from "react";
 import { BlogPostCategory } from "../types/blogPost";
 
-export interface PostFormProps {
+export interface PostCardProps {
   title: string;
   score: number;
   categories: BlogPostCategory[];
   author: string;
 }
 
-export function PostCard({ categories, score, title }: PostFormProps) {
+export function PostCard({ categories, score, title }: PostCardProps) {
   return (
-    <ListItem>
-      <Card bg={"gray.300"} mb={5} mt={5}>
-        <CardHeader>
-          <Box display={"flex"} justifyContent={"space-between"}>
-            {" "}
-            <Heading size="md">Author</Heading>
-            <Text size="md">{score}</Text>
-          </Box>
-        </CardHeader>
+    <Card bg={"gray.300"} mb={5} mt={5}>
+      <CardHeader>
+        <Box display={"flex"} justifyContent={"space-between"}>
+          {" "}
+          <Heading size="md">Author</Heading>
+          <Text size="md">{score}</Text>
+        </Box>
+      </CardHeader>
 
-        <CardBody>
-          <Stack divider={<StackDivider />} spacing="4">
-            <Box>
-              <Text size="xs">{title}</Text>
-            </Box>
-          </Stack>
-          <Text fontSize={12}>Category: {categories.join(", ")}</Text>
-        </CardBody>
-      </Card>
-    </ListItem>
+      <CardBody>
+        <Stack divider={<StackDivider />} spacing="4">
+          <Box>
+            <Text size="xs">{title}</Text>
+          </Box>
+        </Stack>
+        <Text fontSize={12}>Category: {categories.join(", ")}</Text>
+      </CardBody>
+    </Card>
   );
 }

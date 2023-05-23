@@ -19,29 +19,53 @@ const POSTS_PER_PAGE = 8;
 const queryParamsSchema = z.object({
   search: z.string().optional().default(""),
   categories: z.array(z.nativeEnum(BlogPostCategory)).optional().default([]),
+  activePage: z.coerce.number().default(0),
 });
 
-interface QueryParams {
+const parseQueryParams = (
+  rawQueryParams: RawQueryParams
+): z.infer<typeof queryParamsSchema> => {
+  const parsedQueryParams = queryParamsSchema.safeParse({
+    categories: rawQueryParams.categories?.split(","),
+    search: rawQueryParams.search,
+    activePage: rawQueryParams.activePage,
+  });
+
+  if (parsedQueryParams.success) {
+    return parsedQueryParams.data;
+  }
+
+  return {
+    activePage: 0,
+    categories: [],
+    search: "",
+  };
+};
+
+interface RawQueryParams {
   search?: string;
   categories?: string;
+  activePage?: string;
 }
 
 const HomePage: NextPage = () => {
-  const [activePage, setActivePage] = useState(0);
-  const queryParams = qs.parse(window.location.search, {
+  const rawQueryParams = qs.parse(window.location.search, {
     ignoreQueryPrefix: true,
-  }) as QueryParams;
+  }) as RawQueryParams;
+
+  const parsedQueryParams = parseQueryParams(rawQueryParams);
+
+  const [activePage, setActivePage] = useState(parsedQueryParams.activePage);
   const [postListFilters, setPostListFilters] = useState<PostListFiltersValues>(
-    () =>
-      queryParamsSchema.parse({
-        categories: queryParams.categories?.split(","),
-        search: queryParams.search,
-      })
+    {
+      categories: parsedQueryParams.categories,
+      search: parsedQueryParams.search,
+    }
   );
   const router = useRouter();
 
-  const debounce = useDebounce(
-    postListFilters.search,
+  const deboucedPostListFilters = useDebounce(
+    postListFilters,
     POST_LIST_FILTERS_DEBOUNCE
   );
 
@@ -49,7 +73,7 @@ const HomePage: NextPage = () => {
     page: activePage,
     perPage: POSTS_PER_PAGE,
     categories: postListFilters.categories,
-    search: debounce,
+    search: deboucedPostListFilters.search,
   });
 
   const handlePostListFiltersChange = async (
@@ -58,10 +82,14 @@ const HomePage: NextPage = () => {
     setPostListFilters(filters);
     await router.push(
       {
-        query: qs.stringify(filters, {
-          arrayFormat: "comma",
-        }),
+        query: qs.stringify(
+          { ...filters, activePage },
+          {
+            arrayFormat: "comma",
+          }
+        ),
       },
+
       undefined,
       {
         shallow: true,
@@ -70,9 +98,28 @@ const HomePage: NextPage = () => {
     setActivePage(0);
   };
 
-  const handlePaginationPageChange = (paginationPage: number) => {
-    setActivePage(paginationPage);
+  const handleUrlAll = async (activePage: number) => {
+    await router.push(
+      {
+        query: qs.stringify(
+          { ...postListFilters, activePage },
+          {
+            arrayFormat: "comma",
+          }
+        ),
+      },
+
+      undefined,
+      {
+        shallow: true,
+      }
+    );
+  };
+
+  const handlePaginationPageChange = async (page: number) => {
+    setActivePage(page);
     window.scroll(0, 0);
+    handleUrlAll(page);
   };
 
   const totalPages = blogPostQuery.data
@@ -102,9 +149,9 @@ const HomePage: NextPage = () => {
       />
       {totalPages > 0 && (
         <Pagination
-          paginationPages={totalPages}
+          totalPages={totalPages}
           activePage={activePage}
-          handlePaginationPageChange={handlePaginationPageChange}
+          handlePageChange={handlePaginationPageChange}
         />
       )}
     </Layout>
