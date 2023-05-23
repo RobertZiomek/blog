@@ -53,7 +53,7 @@ export const blogPostRouter = createTRPCRouter({
           score: blogPost.score,
           title: blogPost.title,
         })),
-        total: blogPosts.length,
+        total: filteredBlogPosts.length,
       };
     }),
 });

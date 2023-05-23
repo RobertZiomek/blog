@@ -6,7 +6,7 @@ import { faker } from "@faker-js/faker";
 import * as R from "remeda";
 import { BlogPostCategory } from "../../types/blogPost";
 
-const FAKE_BLOG_POST_COUNT = 40;
+const FAKE_BLOG_POST_COUNT = 80;
 
 export default async function handler(
   req: NextApiRequest,
