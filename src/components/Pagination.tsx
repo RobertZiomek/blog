@@ -4,7 +4,7 @@ import React from "react";
 interface PaginationProps {
   totalPages: number;
   activePage: number;
-  handlePageChange: (Page: number) => void;
+  handlePageChange: (page: number) => void;
 }
 
 export const Pagination = ({

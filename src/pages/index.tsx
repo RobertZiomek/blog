@@ -3,7 +3,7 @@ import { type NextPage } from "next";
 import { Layout } from "../components/Layout";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
-import { PostList } from "../components/PostList";
+import { PostList } from "../components/PostListFilters";
 import { api } from "../utils/api";
 import { useState } from "react";
 import { useDebounce } from "../hooks/useDebounce";
@@ -64,7 +64,7 @@ const HomePage: NextPage = () => {
   );
   const router = useRouter();
 
-  const deboucedPostListFilters = useDebounce(
+  const debouncedPostListFilters = useDebounce(
     postListFilters,
     POST_LIST_FILTERS_DEBOUNCE
   );
@@ -72,18 +72,19 @@ const HomePage: NextPage = () => {
   const blogPostQuery = api.blogPost.getBlogPosts.useQuery({
     page: activePage,
     perPage: POSTS_PER_PAGE,
-    categories: postListFilters.categories,
-    search: deboucedPostListFilters.search,
+    categories: debouncedPostListFilters.categories,
+    search: debouncedPostListFilters.search,
   });
 
   const handlePostListFiltersChange = async (
     filters: PostListFiltersValues
   ) => {
     setPostListFilters(filters);
+    setActivePage(0);
     await router.push(
       {
         query: qs.stringify(
-          { ...filters, activePage },
+          { ...filters, activePage: 0 },
           {
             arrayFormat: "comma",
           }
@@ -95,14 +96,16 @@ const HomePage: NextPage = () => {
         shallow: true,
       }
     );
-    setActivePage(0);
   };
 
-  const handleUrlAll = async (activePage: number) => {
+  const updateQueryParams = async (
+    filters: PostListFiltersValues,
+    activePage: number
+  ) => {
     await router.push(
       {
         query: qs.stringify(
-          { ...postListFilters, activePage },
+          { ...filters, activePage },
           {
             arrayFormat: "comma",
           }
@@ -119,7 +122,7 @@ const HomePage: NextPage = () => {
   const handlePaginationPageChange = async (page: number) => {
     setActivePage(page);
     window.scroll(0, 0);
-    handleUrlAll(page);
+    updateQueryParams(postListFilters, page);
   };
 
   const totalPages = blogPostQuery.data
