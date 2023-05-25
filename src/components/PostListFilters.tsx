@@ -26,17 +26,16 @@ export const PostList = ({
 
   return (
     <List>
-      <ListItem>
-        {posts.map(({ author, categories, score, title, id }) => (
+      {posts.map(({ author, categories, score, title, id }) => (
+        <ListItem key={id}>
           <PostCard
-            key={id}
             title={title}
             author={author.id}
             categories={categories}
             score={score}
           />
-        ))}
-      </ListItem>
+        </ListItem>
+      ))}
     </List>
   );
 };
