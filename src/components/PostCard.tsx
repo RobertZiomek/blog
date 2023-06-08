@@ -18,13 +18,13 @@ export interface PostCardProps {
   author: string;
 }
 
-export function PostCard({ categories, score, title }: PostCardProps) {
+export function PostCard({ categories, score, title, author }: PostCardProps) {
   return (
     <Card bg={"gray.300"} mb={5} mt={5}>
       <CardHeader>
         <Box display={"flex"} justifyContent={"space-between"}>
           {" "}
-          <Heading size="md">Author</Heading>
+          <Heading size="md">{title}</Heading>
           <Text size="md">{score}</Text>
         </Box>
       </CardHeader>
@@ -32,7 +32,7 @@ export function PostCard({ categories, score, title }: PostCardProps) {
       <CardBody>
         <Stack divider={<StackDivider />} spacing="4">
           <Box>
-            <Text size="xs">{title}</Text>
+            <Text size="xs">{author}</Text>
           </Box>
         </Stack>
         <Text fontSize={12}>Category: {categories.join(", ")}</Text>

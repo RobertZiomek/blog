@@ -23,6 +23,7 @@ export default async function handler(
 
   blogPosts.splice(0, blogPosts.length);
   new Array(FAKE_BLOG_POST_COUNT).fill(null).forEach(() => {
+    const title = faker.lorem.text().slice(0, 50);
     blogPosts.push({
       author: {
         id: user.id,
@@ -37,7 +38,7 @@ export default async function handler(
       ),
       id: v4(),
       score: faker.datatype.number({ min: -20, max: 20 }),
-      title: faker.lorem.text(),
+      title: title,
       content: faker.lorem.text(),
       status: BlogPostStatus.PUBLISHED,
     });

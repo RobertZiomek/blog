@@ -128,7 +128,6 @@ const HomePage: NextPage = () => {
   const totalPages = blogPostQuery.data
     ? Math.ceil(blogPostQuery.data.total / POSTS_PER_PAGE)
     : 0;
-
   return (
     <Layout>
       <HStack spacing={4} mb={5}>
@@ -137,6 +136,7 @@ const HomePage: NextPage = () => {
         <Button onClick={() => router.replace("/user/profile")}>
           User Profile
         </Button>
+        <Button onClick={() => router.replace("/addPost")}>Add Post</Button>
       </HStack>
 
       <SearchPost
