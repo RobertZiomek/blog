@@ -1,9 +1,7 @@
-import { Button, Text, VStack } from "@chakra-ui/react";
+import { Button, VStack } from "@chakra-ui/react";
 import { useAuth } from "../hooks/useAuth";
-import { useRouter } from "next/router";
 import { Layout } from "../components/Layout";
 const HeaderPage = () => {
-  const router = useRouter();
   const { logout } = useAuth();
   const handleLogut = () => {
     logout();
