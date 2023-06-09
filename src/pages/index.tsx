@@ -3,12 +3,15 @@ import { type NextPage } from "next";
 import { Layout } from "../components/Layout";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
-import { PostList } from "../components/PostListFilters";
+import { PostList } from "../components/PostList";
 import { api } from "../utils/api";
 import { useState } from "react";
 import { useDebounce } from "../hooks/useDebounce";
 import { Pagination } from "../components/Pagination";
-import { PostListFiltersValues, SearchPost } from "../components/SearchPost";
+import {
+  PostListFiltersValues,
+  PostListFilters,
+} from "../components/PostListFilters";
 import { z } from "zod";
 import { BlogPostCategory } from "../types/blogPost";
 import qs from "qs";
@@ -76,32 +79,34 @@ const HomePage: NextPage = () => {
     search: debouncedPostListFilters.search,
   });
 
-  const handlePostListFiltersChange = async (
-    filters: PostListFiltersValues
-  ) => {
-    setPostListFilters(filters);
-    setActivePage(0);
-    await router.push(
-      {
-        query: qs.stringify(
-          { ...filters, activePage: 0 },
-          {
-            arrayFormat: "comma",
-          }
-        ),
-      },
+  // const handlePostListFiltersChange = async (
+  //   filters: PostListFiltersValues
+  // ) => {
+  //   setPostListFilters(filters);
+  //   setActivePage(0);
+  //   await router.push(
+  //     {
+  //       query: qs.stringify(
+  //         { ...filters, activePage: 0 },
+  //         {
+  //           arrayFormat: "comma",
+  //         }
+  //       ),
+  //     },
 
-      undefined,
-      {
-        shallow: true,
-      }
-    );
-  };
+  //     undefined,
+  //     {
+  //       shallow: true,
+  //     }
+  //   );
+  // };
 
   const updateQueryParams = async (
     filters: PostListFiltersValues,
     activePage: number
   ) => {
+    setPostListFilters(filters);
+    setActivePage(activePage);
     await router.push(
       {
         query: qs.stringify(
@@ -139,9 +144,9 @@ const HomePage: NextPage = () => {
         <Button onClick={() => router.replace("/addPost")}>Add Post</Button>
       </HStack>
 
-      <SearchPost
+      <PostListFilters
         filters={postListFilters}
-        onFiltersChange={handlePostListFiltersChange}
+        onFiltersChange={updateQueryParams}
       />
 
       <PostList

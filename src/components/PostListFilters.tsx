@@ -1,41 +1,66 @@
-import { List, ListItem } from "@chakra-ui/react";
-import { ListBlogPost } from "../types/blogPost";
-import { PostCard } from "./PostCard";
-import { PostListEmpty } from "./PostListEmpty";
-import { PostListError } from "./PostListError";
-import { PostListLoader } from "./PostListLoader";
+import { Checkbox, HStack, Input, Stack, Text } from "@chakra-ui/react";
+import React from "react";
+import { BlogPostCategory } from "../types/blogPost";
 
-interface PostListProps {
-  posts: ListBlogPost[];
-  isLoading: boolean;
-  isError: boolean;
-  blogPostPerPage: number;
+interface PostListFiltersProps {
+  onFiltersChange: (filters: PostListFiltersValues, activePage: number) => void;
+  filters: PostListFiltersValues;
 }
 
-export const PostList = ({
-  posts,
-  isLoading,
-  isError,
-  blogPostPerPage,
-}: PostListProps) => {
-  if (isLoading) return <PostListLoader blogPostPerPage={blogPostPerPage} />;
+export interface PostListFiltersValues {
+  categories: BlogPostCategory[];
+  search: string;
+}
 
-  if (isError) return <PostListError />;
+export const PostListFilters = ({
+  onFiltersChange,
+  filters,
+}: PostListFiltersProps) => {
+  const blogPostCategories = Object.values(BlogPostCategory);
 
-  if (posts.length === 0) return <PostListEmpty />;
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const toggledCategory = e.target.value as BlogPostCategory;
+    const updatedCategories = filters.categories.includes(toggledCategory)
+      ? filters.categories.filter((category) => category !== toggledCategory)
+      : [...filters.categories, toggledCategory];
 
+    onFiltersChange({ ...filters, categories: updatedCategories }, 0);
+  };
+
+  const handleSearchWordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onFiltersChange(
+      {
+        ...filters,
+        search: e.target.value,
+      },
+      0
+    );
+  };
   return (
-    <List>
-      {posts.map(({ author, categories, score, title, id }) => (
-        <ListItem key={id}>
-          <PostCard
-            title={title}
-            author={author.id}
-            categories={categories}
-            score={score}
-          />
-        </ListItem>
-      ))}
-    </List>
+    <>
+      <HStack spacing={[1, 5]}>
+        <Text>Category: </Text>
+        {blogPostCategories.map((category) => (
+          <Checkbox
+            key={category}
+            value={category}
+            isChecked={filters.categories.includes(category)}
+            size="lg"
+            colorScheme="green"
+            onChange={handleCategoryChange}
+          >
+            {category}
+          </Checkbox>
+        ))}
+      </HStack>
+      <Stack spacing={3}>
+        <Input
+          placeholder="Search..."
+          size="md"
+          onChange={handleSearchWordChange}
+          value={filters.search}
+        />
+      </Stack>
+    </>
   );
 };
