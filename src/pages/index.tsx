@@ -79,28 +79,6 @@ const HomePage: NextPage = () => {
     search: debouncedPostListFilters.search,
   });
 
-  // const handlePostListFiltersChange = async (
-  //   filters: PostListFiltersValues
-  // ) => {
-  //   setPostListFilters(filters);
-  //   setActivePage(0);
-  //   await router.push(
-  //     {
-  //       query: qs.stringify(
-  //         { ...filters, activePage: 0 },
-  //         {
-  //           arrayFormat: "comma",
-  //         }
-  //       ),
-  //     },
-
-  //     undefined,
-  //     {
-  //       shallow: true,
-  //     }
-  //   );
-  // };
-
   const updateQueryParams = async (
     filters: PostListFiltersValues,
     activePage: number
